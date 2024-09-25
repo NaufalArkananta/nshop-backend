@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id         Int      @id @default(autoincrement())
+  name       String   @default("")
+  email      String   @unique
+  password   String   @default("")
+  address    String   @default("")
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  orders     orders[] // Relasi one-to-many ke orders
+}
+
+model products {
+  id            Int             @id @default(autoincrement())
+  name          String          @default("")
+  description   String          @default("")
+  price         Float           @default(0) @db.Double
+  stock         Int             @default(0)
+  photo         String          @default("")
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  category_id   Int // Foreign key ke categories.id
+  order_details order_details[]
+  category      categories      @relation(fields: [category_id], references: [id]) // Relasi ke categories
+}
+
+model categories {
+  id       Int        @id @default(autoincrement())
+  name     String     @default("")
+  products products[]
+}
+
+model orders {
+  id            Int             @id @default(autoincrement())
+  user_id       Int // Foreign key ke user.id
+  user          user            @relation(fields: [user_id], references: [id]) // Relasi ke user
+  orderStatus   OrderStatus
+  totalPrice    Float
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  payment       payments[]
+  order_details order_details[]
+}
+
+model order_details {
+  id         Int      @id @default(autoincrement())
+  orders_id  Int
+  product_id Int
+  quantity   Int
+  price      Float
+  product    products @relation(fields: [product_id], references: [id])
+  orders     orders   @relation(fields: [orders_id], references: [id])
+}
+
+model payments {
+  id            Int           @id @default(autoincrement())
+  orders_id     Int
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus
+  paymentDate   DateTime      @default(now())
+  orders        orders        @relation(fields: [orders_id], references: [id])
+}
+
+model admin {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String          @unique
+  password      String
+  role          AdminRole
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  admin_actions admin_actions[]
+}
+
+model admin_actions {
+  id         Int        @id @default(autoincrement())
+  admin_id   Int
+  actionType ActionType
+  targetType TargetType
+  target_id  Int
+  actionDate DateTime   @default(now())
+  admin      admin      @relation(fields: [admin_id], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MANAGER
+}
+
+enum ActionType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum TargetType {
+  PRODUCT
+  ORDER
+  CATEGORY
+}

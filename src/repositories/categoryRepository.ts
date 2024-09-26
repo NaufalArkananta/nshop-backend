@@ -26,6 +26,12 @@ export class CategoryRepository {
         });
     }
 
+    async findCategoryByCategory(category: string) {
+        return await prisma.categories.findFirst({
+            where: {name: category}
+        })
+    }
+
     async updateCategory(id: number, data: Partial<{ name: string }>) {
         return await prisma.categories.update({
             where: { id },

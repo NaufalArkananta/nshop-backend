@@ -5,6 +5,13 @@ const userService = new UserService()
 
 const createUser = async (req: Request, res: Response) => {
     try {
+        const existingUser = await userService.getUserByEmail(req.body.email)
+        if(existingUser){
+            return res.status(400).json({
+                message: "Email already exists"
+            })
+        }
+
         const user = await userService.createUser(req.body)
         return res.status(201).json({
             message: "User created successfully",
@@ -35,7 +42,9 @@ const getUserById = async (req: Request, res: Response) => {
 
 const getUserByEmail = async (req: Request, res: Response) => {
     try {
-        const user = await userService.getUserById(parseInt(req.params.email))
+        const email = req.query.email as string
+
+        const user = await userService.getUserByEmail(email)
 
         if(!user){
             return res.status(404).json({

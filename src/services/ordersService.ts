@@ -8,8 +8,8 @@ export class OrderService {
         this.orderRepository = new OrderRepository
     }
 
-    async createOrder(data: {user_id: number, orderStatus: 'PENDING' | 'COMPLETED' | 'CANCELED', totalPrice: number}): Promise<orders> {
-        return await this.orderRepository.createOrder(data)
+    async createOrder(data: { user_id: number; orderStatus: 'PENDING' | 'COMPLETED' | 'CANCELED'; totalPrice: number }) {
+        return await this.orderRepository.createOrder(data);
     }
 
     async findAllOrders(): Promise<orders[]> {

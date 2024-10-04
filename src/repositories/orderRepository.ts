@@ -3,11 +3,12 @@ import { PrismaClient, orders } from "@prisma/client";
 const prisma = new PrismaClient({errorFormat: "minimal"})
 
 export class OrderRepository {
-    async createOrder(data: { user_id: number, orderStatus: 'PENDING' | 'COMPLETED' | 'CANCELED', totalPrice: number }): Promise<orders> {
+    async createOrder(data: { user_id: number; orderStatus: 'PENDING' | 'COMPLETED' | 'CANCELED'; totalPrice: number }): Promise<orders> {
         return await prisma.orders.create({
             data
         });
     }
+    
 
     async findAllOrders() {
         return await prisma.orders.findMany({
